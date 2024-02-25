@@ -1,0 +1,6 @@
+https://www.digitalocean.com/community/tutorials/how-to-handle-routing-in-react-apps-with-react-router
+https://thomasnguyen.hashnode.dev/how-to-store-and-read-configuration-files-using-react
+
+https://www.freecodecamp.org/news/how-to-use-axios-with-react/
+https://kinsta.com/knowledgebase/objects-are-not-valid-as-a-react-child/
+https://www.geeksforgeeks.org/how-to-create-a-table-in-reactjs/

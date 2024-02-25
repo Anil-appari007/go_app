@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -118,6 +119,10 @@ func deleteItem(c *gin.Context) {
 func main() {
 	fmt.Println("Starting the backend")
 	router := gin.Default()
+	// router.Use(cors)
+	config := cors.DefaultConfig()
+	config.AllowAllOrigins = true
+	router.Use(cors.New(config))
 
 	router.GET("/hello", sayHello)
 	router.GET("/inventoryList", getList)
