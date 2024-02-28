@@ -51,10 +51,15 @@ func addItem(c *gin.Context) {
 		}
 	}
 	if check == 0 {
-		inventoryList = append(inventoryList, newItem)
-		c.IndentedJSON(http.StatusCreated, newItem)
+		// verify whether item details are empty or not
+		if newItem.Id == 0 || newItem.Name == "" {
+			// fmt.Println("invalid item details")
+			c.IndentedJSON(400, gin.H{"error": "invalid item details"})
+		} else {
+			inventoryList = append(inventoryList, newItem)
+			c.IndentedJSON(http.StatusCreated, newItem)
+		}
 	}
-
 }
 func getItemById(c *gin.Context) {
 	for _, each := range inventoryList {

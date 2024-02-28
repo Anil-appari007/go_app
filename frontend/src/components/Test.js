@@ -21,8 +21,6 @@ export default function Table() {
     const [editId, setEditId] = useState('')
     const [editName, setEditName] = useState('')
 
-    const [deleteData, setDeleteData] = useState('');
-
     useEffect(() => {
         axios.get(URL)
         // .then(response => console.log(response))

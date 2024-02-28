@@ -4,3 +4,4 @@ https://thomasnguyen.hashnode.dev/how-to-store-and-read-configuration-files-usin
 https://www.freecodecamp.org/news/how-to-use-axios-with-react/
 https://kinsta.com/knowledgebase/objects-are-not-valid-as-a-react-child/
 https://www.geeksforgeeks.org/how-to-create-a-table-in-reactjs/
+https://create-react-app.dev/docs/adding-custom-environment-variables/
