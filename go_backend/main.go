@@ -76,6 +76,37 @@ func dbItem(c *gin.Context) {
 
 }
 
+func dbAddItem(c *gin.Context) {
+	// Read the input, store in var
+	// check db if item name exists
+	// if not exists, add to db
+
+	var ai inventory
+	err := c.BindJSON(&ai)
+	checkError(err, "dbAddItem bindjson")
+	fmt.Printf("\nItem to add %s", ai.Name)
+
+	QUERY := "SELECT * FROM inventory WHERE name = '" + ai.Name + "';"
+	db := openDbConn()
+	rows, err := db.Query(QUERY)
+	checkError(err, "dbAddItem Query")
+	if rows.Next() {
+		message := "item " + ai.Name + " already exists"
+		c.IndentedJSON(400, gin.H{"error": message})
+	} else {
+		/*
+					INSERT INTO inventory (name, price, sales, stock)
+			VALUES ('papayya', 33, 45, 90);
+		*/
+		AddQuery := "INSERT INTO inventory (name, price, sales, stock) VALUES ($1, $2, $3, $4);"
+		// _, err = db.Exec(AddQuery)
+		_, err = db.Exec(AddQuery, ai.Name, ai.Price, ai.Sales, ai.Stock)
+		checkError(err, "dbAddItem exec query")
+		message := "item " + ai.Name + " added"
+		c.IndentedJSON(200, message)
+	}
+}
+
 func dbv2(c *gin.Context) {
 	db := openDbConn()
 	rows, err := db.Query("SELECT version();")
@@ -265,6 +296,7 @@ func main() {
 	router.GET("dbv2", dbv2)
 	router.GET("/dbinventoryList", dbinventoryList)
 	router.GET("/dbinventoryList/:name", dbItem)
+	router.POST("/dbAddItem", dbAddItem)
 	// router.SetTrustedProxies(nil)
 	router.SetTrustedProxies([]string{"127.0.0.1"})
 	router.Run("localhost:8888")
