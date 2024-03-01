@@ -63,6 +63,7 @@ func dbItem(c *gin.Context) {
 	QUUERY := "SELECT * FROM inventory WHERE name = '" + ri + "';"
 
 	db := openDbConn()
+	defer db.Close()
 	rows, err := db.Query(QUUERY)
 	checkError(err, "dbItem query")
 	if rows.Next() {
@@ -88,25 +89,78 @@ func dbAddItem(c *gin.Context) {
 
 	QUERY := "SELECT * FROM inventory WHERE name = '" + ai.Name + "';"
 	db := openDbConn()
+	defer db.Close()
 	rows, err := db.Query(QUERY)
 	checkError(err, "dbAddItem Query")
 	if rows.Next() {
 		message := "item " + ai.Name + " already exists"
 		c.IndentedJSON(400, gin.H{"error": message})
 	} else {
-		/*
-					INSERT INTO inventory (name, price, sales, stock)
-			VALUES ('papayya', 33, 45, 90);
-		*/
 		AddQuery := "INSERT INTO inventory (name, price, sales, stock) VALUES ($1, $2, $3, $4);"
-		// _, err = db.Exec(AddQuery)
 		_, err = db.Exec(AddQuery, ai.Name, ai.Price, ai.Sales, ai.Stock)
 		checkError(err, "dbAddItem exec query")
 		message := "item " + ai.Name + " added"
 		c.IndentedJSON(200, message)
 	}
 }
+func dbUpdateItem(c *gin.Context) {
+	var ui inventory
+	err := c.BindJSON(&ui)
+	// checkError(err, "dbUpdateItem bindjson")
 
+	if err != nil {
+		fmt.Printf("Invalid Item Details %+v\n", ui)
+		message := "item " + ui.Name + " has invalid details"
+		c.IndentedJSON(400, gin.H{"error": message})
+		return
+	}
+	// check the item exists or not
+	// update if exists
+	db := openDbConn()
+	SEARCH_Q := "SELECT name FROM inventory WHERE name = '" + ui.Name + "';"
+	rows, err := db.Query(SEARCH_Q)
+	checkError(err, "dbUpdateItem query")
+	if rows.Next() {
+		// update inventory SET price = 12, sales = 20, stock = 49 WHERE name = 'apple';
+		U_Q := "update inventory SET price = $2, sales = $3, stock = $4 WHERE name = $1;"
+		_, err = db.Exec(U_Q, ui.Name, ui.Price, ui.Sales, ui.Stock)
+		checkError(err, "dbUpdateItem exec")
+		message := "item " + ui.Name + " updated successfully"
+		c.IndentedJSON(200, gin.H{"success": message})
+	} else {
+		message := "item " + ui.Name + " not found"
+		c.IndentedJSON(400, gin.H{"error": message})
+	}
+}
+
+func dbDeleteItem(c *gin.Context) {
+	var di inventory
+	err := c.BindJSON(&di)
+	// checkError(err, "Error in BindJson")
+	if err != nil {
+		fmt.Printf("Invalid Json details %+v \n", di)
+		c.IndentedJSON(400, gin.H{"error": "Invalid Json details"})
+		return
+	}
+
+	db := openDbConn()
+	defer db.Close()
+
+	rows, err := db.Query("SELECT name FROM inventory WHERE name = $1;", di.Name)
+	checkError(err, "dbDeleteItem select query")
+	if rows.Next() {
+		// Delete
+		DELETE_Q := "DELETE FROM inventory WHERE name = $1;"
+		_, err = db.Exec(DELETE_Q, di.Name)
+		checkError(err, "dbDeleteItem delete query exec")
+		c.IndentedJSON(200, gin.H{"success": "item deleted"})
+	} else {
+		// Item Not Found
+		c.IndentedJSON(400, gin.H{"error": "item not found"})
+	}
+	// DELETE_Q := "DO $$ BEGIN DELETE FROM INVENTORY WHERE name = '$1'; IF NOT FOUND THEN RAISE EXCEPTION 'Item not found: %', '$1'; END IF; END $$;"
+
+}
 func dbv2(c *gin.Context) {
 	db := openDbConn()
 	rows, err := db.Query("SELECT version();")
@@ -132,9 +186,10 @@ func openDbConn() *sql.DB {
 
 func checkError(err error, method string) {
 	if err != nil {
-		fmt.Printf("\nError During %s", method)
+		fmt.Printf("\nError During %s\n", method)
 		fmt.Println(err)
-		os.Exit(2)
+		return
+		// os.Exit(2)
 	}
 }
 
@@ -297,6 +352,8 @@ func main() {
 	router.GET("/dbinventoryList", dbinventoryList)
 	router.GET("/dbinventoryList/:name", dbItem)
 	router.POST("/dbAddItem", dbAddItem)
+	router.PUT("/dbUpdateItem", dbUpdateItem)
+	router.DELETE("/dbDeleteItem", dbDeleteItem)
 	// router.SetTrustedProxies(nil)
 	router.SetTrustedProxies([]string{"127.0.0.1"})
 	router.Run("localhost:8888")
