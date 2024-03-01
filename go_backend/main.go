@@ -37,19 +37,45 @@ var inventoryList = []inventory{
 	{Id: 4, Name: "orange", Price: 1.98, Sales: 34, Stock: 311},
 }
 
-func dbinventoryList(c *gin.Context) {
+func dbList() []inventory {
 	db := openDbConn()
 	rows, err := db.Query("SELECT * FROM inventory;")
-	checkError(err, "dbinventoryList select")
-	var dbinventoryList []inventory
+	checkError(err, "dbList select")
+	var dbList []inventory
 	for rows.Next() {
 		var item inventory
 		err = rows.Scan(&item.Id, &item.Name, &item.Price, &item.Sales, &item.Stock)
-		checkError(err, "dbinventoryList rows scan")
-		dbinventoryList = append(dbinventoryList, item)
+		checkError(err, "dbList rows scan")
+		dbList = append(dbList, item)
 	}
+	defer db.Close()
+	return dbList
+}
+
+func dbinventoryList(c *gin.Context) {
+	dbinventoryList := dbList()
 	c.IndentedJSON(200, dbinventoryList)
 }
+
+func dbItem(c *gin.Context) {
+	var getItem inventory
+	ri := c.Param("name")
+	QUUERY := "SELECT * FROM inventory WHERE name = '" + ri + "';"
+
+	db := openDbConn()
+	rows, err := db.Query(QUUERY)
+	checkError(err, "dbItem query")
+	if rows.Next() {
+		err = rows.Scan(&getItem.Id, &getItem.Name, &getItem.Price, &getItem.Sales, &getItem.Stock)
+		checkError(err, "dbItem row scan")
+		c.IndentedJSON(200, getItem)
+	} else {
+		errorMessage := "item " + ri + " not found"
+		c.IndentedJSON(404, gin.H{"error": errorMessage})
+	}
+
+}
+
 func dbv2(c *gin.Context) {
 	db := openDbConn()
 	rows, err := db.Query("SELECT version();")
@@ -60,6 +86,7 @@ func dbv2(c *gin.Context) {
 		checkError(err, "dbv2 row scan")
 	}
 	fmt.Println(dbV2)
+	defer db.Close()
 	c.IndentedJSON(200, gin.H{"dbv2": dbV2})
 }
 
@@ -237,7 +264,7 @@ func main() {
 
 	router.GET("dbv2", dbv2)
 	router.GET("/dbinventoryList", dbinventoryList)
-
+	router.GET("/dbinventoryList/:name", dbItem)
 	// router.SetTrustedProxies(nil)
 	router.SetTrustedProxies([]string{"127.0.0.1"})
 	router.Run("localhost:8888")
