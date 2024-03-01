@@ -13,13 +13,6 @@ import (
 	_ "github.com/lib/pq"
 )
 
-// Database is Postgresql
-// var DB_HOST = os.Getenv("DB_HOST")
-// var DB_USER = os.Getenv("DB_USER")
-// var DB_PASSWORD = os.Getenv("DB_PASSWORD")
-// var DB_PORT_STR = os.Getenv("DB_PORT")
-// var DB_NAME = os.Getenv("DB_NAME")
-// var DB_PORT int
 var (
 	DB_HOST     = os.Getenv("DB_HOST")
 	DB_USER     = os.Getenv("DB_USER")
@@ -44,23 +37,19 @@ var inventoryList = []inventory{
 	{Id: 4, Name: "orange", Price: 1.98, Sales: 34, Stock: 311},
 }
 
-func dbVersion(c *gin.Context) {
-	dbInfo := fmt.Sprintf("host=%s port=%s user=%s "+"password=%s dbname=%s sslmode=disable", DB_HOST, DB_PORT_STR, DB_USER, DB_PASSWORD, DB_NAME)
-	db, err := sql.Open("postgres", dbInfo)
-	checkError(err, "sql open")
-	rows, err := db.Query("SELECT version();")
-	checkError(err, "Query Execution")
-	var dbVersion string
+func dbinventoryList(c *gin.Context) {
+	db := openDbConn()
+	rows, err := db.Query("SELECT * FROM inventory;")
+	checkError(err, "dbinventoryList select")
+	var dbinventoryList []inventory
 	for rows.Next() {
-
-		err = rows.Scan(&dbVersion)
-		checkError(err, "row scan")
-		fmt.Println(dbVersion)
+		var item inventory
+		err = rows.Scan(&item.Id, &item.Name, &item.Price, &item.Sales, &item.Stock)
+		checkError(err, "dbinventoryList rows scan")
+		dbinventoryList = append(dbinventoryList, item)
 	}
-	defer db.Close()
-	c.IndentedJSON(200, gin.H{"version": dbVersion})
+	c.IndentedJSON(200, dbinventoryList)
 }
-
 func dbv2(c *gin.Context) {
 	db := openDbConn()
 	rows, err := db.Query("SELECT version();")
@@ -246,9 +235,8 @@ func main() {
 
 	router.DELETE("/deleteItem", deleteItem)
 
-	router.GET("/dbVersion", dbVersion)
 	router.GET("dbv2", dbv2)
-	// router.GET("/dbinventoryList", dbinventoryList)
+	router.GET("/dbinventoryList", dbinventoryList)
 
 	// router.SetTrustedProxies(nil)
 	router.SetTrustedProxies([]string{"127.0.0.1"})
