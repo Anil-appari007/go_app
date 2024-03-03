@@ -1,7 +1,7 @@
-CREATE DATABASE inventory;
-\l
+-- CREATE DATABASE inventory;
+-- \l
 
-\c inventory
+-- \c inventory
 
 CREATE TABLE inventory (
   id SERIAL UNIQUE PRIMARY KEY, 
@@ -11,7 +11,7 @@ CREATE TABLE inventory (
   stock INT
 );
 
-\dt
+-- \dt
 
 INSERT INTO inventory (name, price, sales, stock)
 VALUES ('apple', 11.11, 22, 44);
@@ -25,15 +25,15 @@ VALUES
 INSERT INTO inventory (name, price, sales, stock)
 VALUES ('papayya', 33, 45, 90);
 
-select * from inventory;
+-- select * from inventory;
 
-select * from inventory where name = 'apple';
+-- select * from inventory where name = 'apple';
 
-update inventory
-SET price = 12, sales = 20, stock = 49
-WHERE name = 'apple';
+-- update inventory
+-- SET price = 12, sales = 20, stock = 49
+-- WHERE name = 'apple';
 
 
-DELETE FROM inventory
-WHERE name = 'apple';
+-- DELETE FROM inventory
+-- WHERE name = 'apple';
 

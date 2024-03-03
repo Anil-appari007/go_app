@@ -10,6 +10,6 @@ $ go run main.
 $ export REACT_APP_API_URL=http://localhost:8888
 
 ## Start Frontend with
-$ npm start
+$ export REACT_APP_API_URL=http://localhost:8888 && npm start
 
 ## Access at http://localhost:3000/

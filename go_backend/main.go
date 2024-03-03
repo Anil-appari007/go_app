@@ -204,6 +204,6 @@ func main() {
 
 	router.DELETE("/deleteItem", dbDeleteItem)
 	// router.SetTrustedProxies(nil)
-	router.SetTrustedProxies([]string{"127.0.0.1"})
-	router.Run("localhost:8888")
+	router.SetTrustedProxies([]string{"127.0.0.1", "0.0.0.0"})
+	router.Run("0.0.0.0:8888")
 }

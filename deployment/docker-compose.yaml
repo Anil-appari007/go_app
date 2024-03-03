@@ -1,30 +1,41 @@
 services:
   frontend:
     image: frontend:1
+    container_name: frontend
     environment:
       - REACT_APP_API_URL=backend:8888
-
+    ports:
+      - "80:80"
+    expose:
+      - 80
+    depends_on:
+      - backend
+    
   backend:
-    image: gobackendapp:1
+    image: gobackendapp:2
+    container_name: gobackendapp
     environment:
       - DB_HOST=postgres
       - DB_USER=postgres
-      - DB_PASSWORD=
+      - DB_PASSWORD=${DB_PASSWORD}
       - DB_NAME=inventory
       - DB_PORT=5432
+    ports:
+      - "8888:8888"
     expose:
       - 8888
     depends_on:
-      db:
+      postgres:
         condition: service_healthy
 
   postgres:
-    image: postgres
+    image: custompostgres:1
+    container_name: postgres
     restart: always
     user: postgres
     environment:
       - POSTGRES_DB=inventory
-      - POSTGRES_PASSWORD=
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
     expose:
       - 5432
     healthcheck:
