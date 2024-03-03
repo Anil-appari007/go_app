@@ -10,8 +10,8 @@ import Table from './components/Test';
 function App() {
   return (
       <div>
-        <h1>Welcome to Sample inventoryList Application</h1>
-        <em>Written with React & Go </em>
+        <h1>Sample InventoryList Application</h1>
+        <em>Written with React, Go lang & Postgresql </em>
         <BrowserRouter>
           <Routes>
             <Route exact path='/' Component={Table}></Route>
@@ -21,6 +21,9 @@ function App() {
             <Route exact path='/test' Component={Table}></Route> */}
           </Routes>
         </BrowserRouter>
+        <footer>
+          <p>v1.00</p>
+        </footer>
       </div>
   );
 }

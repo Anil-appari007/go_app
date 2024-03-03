@@ -65,3 +65,11 @@ td {
   background-color: green;
   color: white;
 }
+
+footer{
+  text-align: center;
+  padding: 0px;
+  background-color: darkred;
+  color: white;
+  /* display: block; */
+}
