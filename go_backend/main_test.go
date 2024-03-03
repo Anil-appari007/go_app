@@ -31,3 +31,7 @@ func TestSayHello(t *testing.T) {
 	assert.Equal(t, 200, w.Code)
 
 }
+
+// func TestDbinventoryList(t *testing.T){
+// 	ro
+// }
