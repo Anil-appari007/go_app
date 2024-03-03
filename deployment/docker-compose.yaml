@@ -1,0 +1,36 @@
+services:
+  frontend:
+    image: frontend:1
+    environment:
+      - REACT_APP_API_URL=backend:8888
+
+  backend:
+    image: gobackendapp:1
+    environment:
+      - DB_HOST=postgres
+      - DB_USER=postgres
+      - DB_PASSWORD=
+      - DB_NAME=inventory
+      - DB_PORT=5432
+    expose:
+      - 8888
+    depends_on:
+      db:
+        condition: service_healthy
+
+  postgres:
+    image: postgres
+    restart: always
+    user: postgres
+    environment:
+      - POSTGRES_DB=inventory
+      - POSTGRES_PASSWORD=
+    expose:
+      - 5432
+    healthcheck:
+      test: [ "CMD", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
