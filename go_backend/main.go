@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"os"
 
@@ -17,9 +16,8 @@ var (
 	DB_HOST     = os.Getenv("DB_HOST")
 	DB_USER     = os.Getenv("DB_USER")
 	DB_PASSWORD = os.Getenv("DB_PASSWORD")
-	DB_PORT_STR = os.Getenv("DB_PORT")
+	DB_PORT     = os.Getenv("DB_PORT")
 	DB_NAME     = os.Getenv("DB_NAME")
-	// DB_PORT     int
 )
 
 type inventory struct {
@@ -176,7 +174,7 @@ func dbv2(c *gin.Context) {
 }
 
 func openDbConn() *sql.DB {
-	dbInfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", DB_HOST, DB_PORT_STR, DB_USER, DB_PASSWORD, DB_NAME)
+	dbInfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME)
 	db, err := sql.Open("postgres", dbInfo)
 	checkError(err, "SQL OPEN")
 	err = db.Ping()
@@ -198,7 +196,7 @@ func getList(c *gin.Context) {
 }
 func sayHello(c *gin.Context) {
 	// c.JSON(200, gin.H{"message": "Hello"})
-	c.IndentedJSON(200, gin.H{"message": "hello2"})
+	c.JSON(200, gin.H{"message": "hello2"})
 }
 
 func addItem(c *gin.Context) {
@@ -318,16 +316,16 @@ func deleteItem(c *gin.Context) {
 
 func main() {
 
-	if DB_HOST == "" || DB_USER == "" || DB_PASSWORD == "" || DB_PORT_STR == "" || DB_NAME == "" {
+	if DB_HOST == "" || DB_USER == "" || DB_PASSWORD == "" || DB_PORT == "" || DB_NAME == "" {
 		fmt.Println("Db creds are invalid")
 		os.Exit(2)
 	}
-	DB_PORT, err := strconv.Atoi(DB_PORT_STR)
-	if err != nil {
-		fmt.Println("Error During Atoi")
-		fmt.Println(err)
-	}
-	fmt.Println(DB_PORT)
+	// DB_PORT, err := strconv.Atoi(DB_PORT_STR)
+	// if err != nil {
+	// 	fmt.Println("Error During Atoi")
+	// 	fmt.Println(err)
+	// }
+	// fmt.Println(DB_PORT)
 	// checkDbConnection(DB_HOST, DB_USER, DB_PASSWORD, DB_PORT, DB_NAME)
 	// getDbVersion()
 
@@ -339,14 +337,25 @@ func main() {
 	router.Use(cors.New(config))
 
 	router.GET("/hello", sayHello)
-	router.GET("/inventoryList", getList)
-	router.GET("/inventoryList/:name", getItemById)
+	// router.GET("/inventoryList", getList)
+	// router.GET("/inventoryList/:name", getItemById)
 
-	router.POST("/addItem", addItem)
+	// router.POST("/addItem", addItem)
 
-	router.PUT("/updateItem", updateItem)
+	// router.PUT("/updateItem", updateItem)
 
-	router.DELETE("/deleteItem", deleteItem)
+	// router.DELETE("/deleteItem", deleteItem)
+
+	//
+	router.GET("/inventoryList", dbinventoryList)
+	router.GET("/inventoryList/:name", dbItem)
+
+	router.POST("/addItem", dbAddItem)
+
+	router.PUT("/updateItem", dbUpdateItem)
+
+	router.DELETE("/deleteItem", dbDeleteItem)
+	//
 
 	router.GET("dbv2", dbv2)
 	router.GET("/dbinventoryList", dbinventoryList)
