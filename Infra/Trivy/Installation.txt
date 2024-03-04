@@ -1,0 +1,5 @@
+wget https://github.com/aquasecurity/trivy/releases/download/v0.49.1/trivy_0.49.1_Linux-64bit.tar.gz
+tar -xzf trivy_0.49.1_Linux-64bit.tar.gz
+cp trivy /usr/bin/
+trivy --version
+trivy fs .
