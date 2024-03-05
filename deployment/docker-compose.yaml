@@ -10,8 +10,8 @@ services:
       - 80
     depends_on:
       - backend
-    volumes:
-      - /home/vagrant/API_URL:/usr/share/nginx/html
+    # volumes:
+    #   - /home/vagrant/API_URL:/usr/share/nginx/html
     
   backend:
     image: cbackend:${IMAGE_TAG}
