@@ -1,6 +1,7 @@
 import axios from 'axios'
 import React, {useEffect, useState} from 'react'
-import { API_URL } from '../config'
+// import { API_URL } from '../config'
+const API_URL = process.env.REACT_APP_API_URL
 const URL = API_URL + "/inventoryList"
 
 const ADD_URL = API_URL + "/addItem"
