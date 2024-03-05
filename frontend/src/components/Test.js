@@ -9,9 +9,10 @@ const PUT_URL = API_URL + "/updateItem"
 export default function Table() {
     if (!API_URL) {
         console.error('Error: env var REACT_APP_API_URL found to be empty');
-    } else {
-        console.log('Found env REACT_APP_API_URL', API_URL)
-    }
+    } 
+    // else {
+    //     console.log('Found env REACT_APP_API_URL', API_URL)
+    // }
     const [items, setItems] = useState([])
     const [id, setId] = useState('')
     const [name, setName] = useState('')
