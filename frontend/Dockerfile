@@ -21,5 +21,6 @@ COPY --from=build /app/.nginx/nginx.conf /etc/nginx/conf.d/default.conf
 RUN rm -rf /usr/share/nginx/html/*
 
 COPY --from=build /app/build/* /usr/share/nginx/html/.
-
+RUN ls -lrt /usr/share/nginx/html/
+RUN ls -lrt /usr/share/nginx/html/static
 # ENTRYPOINT ["nginx", "-g", "daemon off;"]
