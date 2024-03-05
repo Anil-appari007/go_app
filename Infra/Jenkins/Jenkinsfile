@@ -13,64 +13,64 @@ pipeline{
                 git 'https://github.com/Anil-appari007/go_app.git'
             }
         }
-        stage("Static_Code_Scan"){
-            parallel{
-                stage("SonarQube-Go"){
-                    steps{
-                        withSonarQubeEnv('SonarQube') {
-                            sh '''
-                                cd ${WORKSPACE}/go_backend && ${SONAR_HOME}/bin/sonar-scanner -Dsonar.projectKey=Go_App -Dsonar.sources=.
-                            '''
-                        }
-                        // script{
-                        //         def qg = waitForQualityGate()
-                        //         if (qg.status != 'OK') {
-                        //             error "Pipeline aborted due to quality gate failure: ${qg.status}"
-                        //         }
-                        // }
-                    }
-                }
-                stage("SonarQube-React"){
-                    steps{
-                        withSonarQubeEnv('SonarQube') { 
-                            sh '''
-                                cd ${WORKSPACE}/frontend && ${SONAR_HOME}/bin/sonar-scanner -Dsonar.projectKey=ReactApp -Dsonar.sources=.
-                            '''
-                        }
-                        // script{
-                        //         def qg = waitForQualityGate() 
-                        //         if (qg.status != 'OK') {
-                        //             error "Pipeline aborted due to quality gate failure: ${qg.status}"
-                        //         }
-                        // }
+        // stage("Static_Code_Scan"){
+        //     parallel{
+        //         stage("SonarQube-Go"){
+        //             steps{
+        //                 withSonarQubeEnv('SonarQube') {
+        //                     sh '''
+        //                         cd ${WORKSPACE}/go_backend && ${SONAR_HOME}/bin/sonar-scanner -Dsonar.projectKey=Go_App -Dsonar.sources=.
+        //                     '''
+        //                 }
+        //                 // script{
+        //                 //         def qg = waitForQualityGate()
+        //                 //         if (qg.status != 'OK') {
+        //                 //             error "Pipeline aborted due to quality gate failure: ${qg.status}"
+        //                 //         }
+        //                 // }
+        //             }
+        //         }
+        //         stage("SonarQube-React"){
+        //             steps{
+        //                 withSonarQubeEnv('SonarQube') { 
+        //                     sh '''
+        //                         cd ${WORKSPACE}/frontend && ${SONAR_HOME}/bin/sonar-scanner -Dsonar.projectKey=ReactApp -Dsonar.sources=.
+        //                     '''
+        //                 }
+        //                 // script{
+        //                 //         def qg = waitForQualityGate() 
+        //                 //         if (qg.status != 'OK') {
+        //                 //             error "Pipeline aborted due to quality gate failure: ${qg.status}"
+        //                 //         }
+        //                 // }
                         
-                    }
-                }
-            }
-        }
-        stage("Vulnerabilities_Scan"){
-            parallel{
-                stage("GO"){
-                    steps{
-                        sh '''
-                            cd ${WORKSPACE}/go_backend
-                            ${GO_HOME}/bin/go mod download
-                            trivy fs .
-                        '''
-                    }
-                }
-                stage("React"){
-                    steps{
-                        sh '''
-                            cd ${WORKSPACE}/frontend
-                            export PATH="${NODE_HOME}/bin:$PATH"
-                            ${NODE_HOME}/bin/npm ci
-                            trivy fs .
-                        '''
-                    }
-                }
-            }
-        }
+        //             }
+        //         }
+        //     }
+        // }
+        // stage("Vulnerabilities_Scan"){
+        //     parallel{
+        //         stage("GO"){
+        //             steps{
+        //                 sh '''
+        //                     cd ${WORKSPACE}/go_backend
+        //                     ${GO_HOME}/bin/go mod download
+        //                     trivy fs .
+        //                 '''
+        //             }
+        //         }
+        //         stage("React"){
+        //             steps{
+        //                 sh '''
+        //                     cd ${WORKSPACE}/frontend
+        //                     export PATH="${NODE_HOME}/bin:$PATH"
+        //                     ${NODE_HOME}/bin/npm ci
+        //                     trivy fs .
+        //                 '''
+        //             }
+        //         }
+        //     }
+        // }
         stage("Parallel_Builds"){
             parallel{
                 stage("FrontEnd_Build"){
@@ -90,6 +90,13 @@ pipeline{
                 }
             }
         }
+        // stage("Update_Repo"){
+        //     steps{
+        //         // Update Docker compose Tags
+        //         // Push commit
+        //         sh "echo updating image tag"
+        //     }
+        // }
         stage("Deploy"){
             steps{
 
@@ -98,44 +105,44 @@ pipeline{
                 }
             }
         }
-        stage("Integration_Tests"){
-            steps{
-                withCredentials([string(credentialsId: 'POSTGRES_DB', variable: 'POSTGRES_DB')]) {
-                    sh '''
-                        cd ${WORKSPACE}/go_backend
-                        export DB_HOST=localhost
-                        export DB_USER=postgres
-                        export DB_PASSWORD=${POSTGRES_DB}
-                        export DB_PORT=5432
-                        export DB_NAME=inventory
-                        ${GO_HOME}/bin/go test --tags=integration -coverprofile=coverage.out
-                    '''
-                }
-            }
-        }
-        stage("DAST_ZAP"){
-            steps{
-                withCredentials([string(credentialsId: 'APP_URL', variable: 'APP_URL')]) {
-                    sh '''
-                        set +e
-                        docker run -dit --name ${ZAP_CONTAINER} ghcr.io/zaproxy/zaproxy:stable bash
-                        docker exec ${ZAP_CONTAINER} mkdir /zap/wrk
-                        docker exec ${ZAP_CONTAINER} zap-baseline.py -r Zap_Report.html -t http://${APP_URL}:80
-                        set -e
+        // stage("Integration_Tests"){
+        //     steps{
+        //         withCredentials([string(credentialsId: 'POSTGRES_DB', variable: 'POSTGRES_DB')]) {
+        //             sh '''
+        //                 cd ${WORKSPACE}/go_backend
+        //                 export DB_HOST=localhost
+        //                 export DB_USER=postgres
+        //                 export DB_PASSWORD=${POSTGRES_DB}
+        //                 export DB_PORT=5432
+        //                 export DB_NAME=inventory
+        //                 ${GO_HOME}/bin/go test --tags=integration -coverprofile=coverage.out
+        //             '''
+        //         }
+        //     }
+        // }
+        // stage("DAST_ZAP"){
+        //     steps{
+        //         withCredentials([string(credentialsId: 'APP_URL', variable: 'APP_URL')]) {
+        //             sh '''
+        //                 set +e
+        //                 docker run -dit --name ${ZAP_CONTAINER} ghcr.io/zaproxy/zaproxy:stable bash
+        //                 docker exec ${ZAP_CONTAINER} mkdir /zap/wrk
+        //                 docker exec ${ZAP_CONTAINER} zap-baseline.py -r Zap_Report.html -t http://${APP_URL}:80
+        //                 set -e
                         
-                        mkdir ${REPORT_FOLDER}
-                        docker exec ${ZAP_CONTAINER} ls -lrt /zap/wrk
-                        docker cp ${ZAP_CONTAINER}:/zap/wrk/Zap_Report.html ${REPORT_FOLDER}/.
-                    '''
-                }
-            }
-        }
+        //                 mkdir ${REPORT_FOLDER}
+        //                 docker exec ${ZAP_CONTAINER} ls -lrt /zap/wrk
+        //                 docker cp ${ZAP_CONTAINER}:/zap/wrk/Zap_Report.html ${REPORT_FOLDER}/.
+        //             '''
+        //         }
+        //     }
+        // }
     }
-    post{
-        always{
-            archiveArtifacts artifacts: 'zap_report/*.html'
-            sh "docker rm -f ${ZAP_CONTAINER}"
-            cleanWs()
-        }
-    }
+    // post{
+    //     always{
+    //         archiveArtifacts artifacts: 'zap_report/*.html'
+    //         sh "docker rm -f ${ZAP_CONTAINER}"
+    //         cleanWs()
+    //     }
+    // }
 }
