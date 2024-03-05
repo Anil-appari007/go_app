@@ -7,6 +7,8 @@ RUN npm ci
 COPY . .
 
 RUN npm run build
+RUN ls -lrt /app/build/
+RUN ls -lrt /app/build/static
 
 
 
