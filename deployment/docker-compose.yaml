@@ -2,14 +2,16 @@ services:
   frontend:
     image: cfrontend:${IMAGE_TAG}
     container_name: frontend
-    environment:
-      - REACT_APP_API_URL=http://backend:8888
+    # environment:
+    #   - REACT_APP_API_URL=http://backend:8888
     ports:
       - "80:80"
     expose:
       - 80
     depends_on:
       - backend
+    volumes:
+      - /home/vagrant/API_URL:/usr/share/nginx/html
     
   backend:
     image: cbackend:${IMAGE_TAG}
